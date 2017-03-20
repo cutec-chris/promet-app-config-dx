@@ -21,13 +21,15 @@
     <script type="text/javascript">
     dhtmlxEvent(window,"load",function(){                          //provides your script as a handler of the 'onload' HTML event
       console.log('Loading Installer...');
+      AvammLogin = 'test';
       InitAvammApp();
+      AvammLogin = null;
       StartAvammApp();
     });
     </script>
   </head>
   <body>
      <div id="sbMain"></div>
-    <script src="times/times.js" type="text/javascript"></script>
+    <script src="config/config.js" type="text/javascript"></script>
   </body>
 </html>
