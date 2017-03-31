@@ -61,8 +61,12 @@ dhtmlxEvent(window,"load",function(){
     	]}
     ]);
     fDatabaseSettings.attachEvent("onButtonClick", function(id){
-      if (id=='bNext')
+      if (id=='bNext') {
         acWizard.goNext();
+        LoadData('/configuration/status',function(Data){
+          console.log(Data);
+        },true);
+      }
       if (id=='bPrior')
         acWizard.goPrev();
     });
