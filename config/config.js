@@ -12,6 +12,8 @@ dhtmlxEvent(window,"load",function(){
         	{type: "label", label: "Wilkommen", value: ""},
         	{type: "label", label: "Hier können Sie festlegen, ob Sie eine persönliche Datenbank auf dieser Mashine, oder einen Datenbankserver verwenden möchten.", labelWidth: "80%"},
         	{type: "block", width: "auto", blockOffset: 20, list: [
+            {type: "radio", label: "Lokale Server Datenbank", name: "n1", value:"serv", checked: true},
+            {type: "label", label: "Es wird eine mitgelieferte Vorkonfigurietrte Datenbank benutzt. Diese verhält sich wie eine Persönliche Datenbank, muss aber nicht separate erstellt und eingerichtet werden.", value: "", labelWidth: "80%"},
         		{type: "radio", label: "Persönliche Datenbank", name: "n1", value:"pers", checked: true},
         		{type: "label", label: "Bei dieser Variante benötigen Sie keinen Datenbankserver, können dafür allerdings auch nur mit bis zu 3 Clients an der selben Datenbank arbeiten. Empfohlen wird diese Variante wenn Sie hauptsächlich allein mit der Datenbank arbeiten", value: "", labelWidth: "80%"},
         		{type: "radio", label: "Datenbankserver", name: "n1", value:"db"},
@@ -65,6 +67,56 @@ dhtmlxEvent(window,"load",function(){
         acWizard.goNext();
         LoadData('/configuration/status',function(Data){
           console.log(Data);
+          if ((Data)&&(Data.xmlDoc)) {
+            if (Data.xmlDoc.status == 200) { // No Configuration found
+              dhtmlx.message({
+                type : "info",
+                text: "Konfiguration wird übertragen",
+                expire: 1000
+              });
+              StoreData('/configuration/add','SQL:',function(Data){
+                if ((aData)&&(aData.xmlDoc)&&(aData.xmlDoc.status == 200)) {
+                    console.log("Data stored");
+                    dhtmlx.message({
+                      type : "info",
+                      text: "Daten erfolgreich gespeichert",
+                      expire: 5000
+                    });
+                } else {
+                  console.log("Data not stored");
+                  dhtmlx.message({
+                    type : "error",
+                    text: "Fehler beim Speichern der Daten",
+                    expire: 5000
+                  });
+                  acWizard.goFirst();
+                }
+              });
+            } else if (Data.xmlDoc.status == 403) { //Server already configured
+              dhtmlx.message({
+                type : "info",
+                text: "Appserver ist bereits konfiguriert",
+                expire: 5000
+              });
+              acWizard.goFirst();
+            } else {
+              acWizard.goFirst();
+              dhtmlx.message({
+                type : "error",
+                text: "Fehler beim kontaktieren des Appservers",
+                expire: 5000
+              });
+            }
+            console.log('Data there');
+          } else {
+            dhtmlx.message({
+              type : "error",
+              text: "Appserver nicht erreichbar",
+              expire: 5000
+            });
+            console.log('Appserver not there');
+            acWizard.goFirst();
+          }
         },true);
       }
       if (id=='bPrior')
@@ -74,10 +126,7 @@ dhtmlxEvent(window,"load",function(){
     fDone = acWizard.cells("tsDone").attachForm([
     	{type: "block", width: "auto", blockOffset: "40", offsetTop: "30", name: "pSQLite", offsetLeft: "50", list: [
     		{type: "settings", inputWidth: "80%"},
-    		{type: "label", label: "Schritte", value: ""},
-    		{type: "multiselect", value: "", inputHeight: "100", inputWidth: "80%"}
-    	]},
-    	{type: "button", name: "bPrior", value: "Zurück", offsetLeft: "50"}
+    	]}
     ]);
       fDone.attachEvent("onButtonClick", function(id){
         if (id=='bPrior')
