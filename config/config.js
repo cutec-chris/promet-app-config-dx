@@ -91,7 +91,7 @@ dhtmlxEvent(window,"load",function(){
                   });
                   acWizard.goFirst();
                 }
-              });
+              },True);
             } else if (Data.xmlDoc.status == 403) { //Server already configured
               dhtmlx.message({
                 type : "info",
