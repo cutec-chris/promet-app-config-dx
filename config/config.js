@@ -27,6 +27,8 @@ dhtmlxEvent(window,"load",function(){
         if (fDatabaseTyp.getItemValue('n1')=='db') {
           fDatabaseSettings.hideItem('pSQLite');
           fDatabaseSettings.showItem('pSQLServer');
+        } else if (fDatabaseTyp.getItemValue('n1')=='serv') {
+          acWizard.goNext();
         } else {
           fDatabaseSettings.hideItem('pSQLServer');
           fDatabaseSettings.showItem('pSQLite');
@@ -40,7 +42,7 @@ dhtmlxEvent(window,"load",function(){
     		{type: "block", width: "auto", blockOffset: "", name: "pSQLite", list: [
     			{type: "settings", offsetLeft: "50", offsetTop: "30"},
     			{type: "label", label: "Datenbankverbindung", value: ""},
-    			{type: "input", label: "Datenbankpfad", value: "~/promet-erp.db"}
+    			{type: "input", label: "Datenbankpfad",name: "db1", value: "~/promet-erp.db"}
     		]},
     		{type: "block", width: "auto", blockOffset: "", name: "pSQLServer", list: [
     			{type: "settings", offsetLeft: "50"},
@@ -50,10 +52,10 @@ dhtmlxEvent(window,"load",function(){
     			{type: "radio", label: "Microsoft SQL Server", name: "n1"},
     			{type: "newcolumn", offset: "50"},
     			{type: "label", label: "Datenbankverbindung", value: ""},
-    			{type: "input", label: "Server", value: "localhost"},
-    			{type: "input", label: "Datenbank(pfad)", value: "promet"},
-    			{type: "input", label: "Benutzername", value: ""},
-    			{type: "password", label: "Kennwort", value: ""}
+    			{type: "input", label: "Server", name: "srv", value: "localhost"},
+    			{type: "input", label: "Datenbank(pfad)", name: "db", value: "promet"},
+    			{type: "input", label: "Benutzername",name: "user", value: ""},
+    			{type: "password", label: "Kennwort",name: "pw", value: ""}
     		]},
     		{type: "block", width: "auto", offsetLeft: "50", offsetTop: "50", list: [
           {type: "button", name: "bPrior", value: "Zurück"},
@@ -74,8 +76,23 @@ dhtmlxEvent(window,"load",function(){
                 text: "Konfiguration wird übertragen",
                 expire: 1000
               });
-              StoreData('/configuration/add','SQL:',function(Data){
-                if ((aData)&&(aData.xmlDoc)&&(aData.xmlDoc.status == 200)) {
+              var iData = 'SQL:';
+              if (fDatabaseTyp.getItemValue('n1')=='db') {
+                if (fDatabaseSettings.getItemValue('n1')==0) {
+                  iData += 'postgres7;';
+                } else if (fDatabaseSettings.getItemValue('n1')==1) {
+                  iData += 'mysql;';
+                } else if (fDatabaseSettings.getItemValue('n1')==2) {
+                  iData += 'mssql;';
+                }
+                iData += fDatabaseSettings.getItemValue('srv')+';'+fDatabaseSettings.getItemValue('db')+';'+fDatabaseSettings.getItemValue('user')+';'+fDatabaseSettings.getItemValue('pw')+';';
+              } else if (fDatabaseTyp.getItemValue('n1')=='serv') {
+                iData += 'sqlite-3-edata;;help/help.db;;;';
+              } else {
+                iData += 'sqlite-3;;'+fDatabaseSettings.getItemValue('db1')+';;;';
+              }
+              StoreData('/configuration/add',iData,function(Data){
+                if ((Data)&&(Data.xmlDoc)&&(Data.xmlDoc.status == 200)) {
                     console.log("Data stored");
                     dhtmlx.message({
                       type : "info",
@@ -91,7 +108,7 @@ dhtmlxEvent(window,"load",function(){
                   });
                   acWizard.goFirst();
                 }
-              },True);
+              },true);
             } else if (Data.xmlDoc.status == 403) { //Server already configured
               dhtmlx.message({
                 type : "info",
