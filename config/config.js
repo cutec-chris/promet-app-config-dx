@@ -106,7 +106,7 @@ dhtmlxEvent(window,"load",function(){
                     text: "Fehler beim Speichern der Daten",
                     expire: 5000
                   });
-                  acWizard.goFirst();
+                  setTimeout(function(){ acWizard.goFirst(); }, 500);
                 }
               },true);
             } else if (Data.xmlDoc.status == 403) { //Server already configured
@@ -117,12 +117,12 @@ dhtmlxEvent(window,"load",function(){
               });
               acWizard.goFirst();
             } else {
-              acWizard.goFirst();
               dhtmlx.message({
                 type : "error",
                 text: "Fehler beim kontaktieren des Appservers",
                 expire: 5000
               });
+              setTimeout(function(){ acWizard.goFirst(); }, 500);
             }
             console.log('Data there');
           } else {
