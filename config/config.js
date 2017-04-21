@@ -8,7 +8,7 @@ dhtmlxEvent(window,"load",function(){
   acWizard.addCell("tsDatabaseTyp");
   var fDatabaseSettings;
 	var fDatabaseTyp = acWizard.cells("tsDatabaseTyp").attachForm([
-      {type: "block", width: "auto", blockOffset: "40", offsetTop: "30", name: "pSQLite", list: [
+      {type: "block", width: "auto", blockOffset: "20", offsetTop: "30", name: "pSQLite", list: [
         	{type: "label", label: "Wilkommen", value: ""},
         	{type: "label", label: "Hier können Sie festlegen, ob Sie eine persönliche Datenbank auf dieser Mashine, oder einen Datenbankserver verwenden möchten.", labelWidth: "80%"},
         	{type: "block", width: "auto", blockOffset: 20, list: [
@@ -68,7 +68,7 @@ dhtmlxEvent(window,"load",function(){
       if (id=='bNext') {
         acWizard.goNext();
         LoadData('/configuration/status',function(Data){
-          console.log(Data);
+          //console.log(Data);
           if ((Data)&&(Data.xmlDoc)) {
             if (Data.xmlDoc.status == 200) { // No Configuration found
               dhtmlx.message({
@@ -99,6 +99,7 @@ dhtmlxEvent(window,"load",function(){
                       text: "Daten erfolgreich gespeichert",
                       expire: 5000
                     });
+                    parent.window.location.href = 'index.html';
                 } else {
                   console.log("Data not stored");
                   dhtmlx.message({
