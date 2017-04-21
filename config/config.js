@@ -1,4 +1,71 @@
 var siConfig,tbToolbar;
+var fDatabaseTyp,fDatabaseSettings;
+function SaveWizard(){
+  acWizard.goNext();
+  LoadData('/configuration/status',function(Data){
+    //console.log(Data);
+    if ((Data)&&(Data.xmlDoc)) {
+      if (Data.xmlDoc.status == 200) { // No Configuration found
+        dhtmlx.message({
+          type : "info",
+          text: "Konfiguration wird übertragen",
+          expire: 1000
+        });
+        var iData = 'SQL:';
+        if (fDatabaseTyp.getItemValue('n1')=='db') {
+          iData += fDatabaseSettings.getItemValue('n3')+';';
+          iData += fDatabaseSettings.getItemValue('srv')+';'+fDatabaseSettings.getItemValue('db')+';'+fDatabaseSettings.getItemValue('user')+';'+fDatabaseSettings.getItemValue('pw')+';';
+        } else if (fDatabaseTyp.getItemValue('n1')=='serv') {
+          iData += 'sqlite-3;;help/help.db;;;';
+        } else {
+          iData += 'sqlite-3;;'+fDatabaseSettings.getItemValue('db1')+';;;';
+        }
+        StoreData('/configuration/add',iData,function(Data){
+          if ((Data)&&(Data.xmlDoc)&&(Data.xmlDoc.status == 200)) {
+              console.log("Data stored");
+              dhtmlx.message({
+                type : "info",
+                text: "Daten erfolgreich gespeichert",
+                expire: 5000
+              });
+              parent.window.location.href = 'index.html';
+          } else {
+            console.log("Data not stored");
+            dhtmlx.message({
+              type : "error",
+              text: "Fehler beim Speichern der Daten:"+Data.xmlDoc.response,
+              expire: 5000
+            });
+            setTimeout(function(){ acWizard.goFirst(); }, 500);
+          }
+        },true);
+      } else if (Data.xmlDoc.status == 403) { //Server already configured
+        dhtmlx.message({
+          type : "info",
+          text: "Appserver ist bereits konfiguriert",
+          expire: 5000
+        });
+        acWizard.goFirst();
+      } else {
+        dhtmlx.message({
+          type : "error",
+          text: "Fehler beim kontaktieren des Appservers",
+          expire: 5000
+        });
+        setTimeout(function(){ acWizard.goFirst(); }, 500);
+      }
+      console.log('Data there');
+    } else {
+      dhtmlx.message({
+        type : "error",
+        text: "Appserver nicht erreichbar",
+        expire: 5000
+      });
+      console.log('Appserver not there');
+      acWizard.goFirst();
+    }
+  },true);
+}
 dhtmlxEvent(window,"load",function(){
   console.log("Loading Install Page...");
   sbMain.addItem({id: 'siInstall', text: 'Einrichtung', icon: 'fa fa-refresh'});
@@ -6,8 +73,7 @@ dhtmlxEvent(window,"load",function(){
   acWizard = siConfig.attachCarousel();
   acWizard.hideControls();
   acWizard.addCell("tsDatabaseTyp");
-  var fDatabaseSettings;
-	var fDatabaseTyp = acWizard.cells("tsDatabaseTyp").attachForm([
+	fDatabaseTyp = acWizard.cells("tsDatabaseTyp").attachForm([
       {type: "block", width: "auto", blockOffset: "20", offsetTop: "30", name: "pSQLite", list: [
         	{type: "label", label: "Wilkommen", value: ""},
         	{type: "label", label: "Hier können Sie festlegen, ob Sie eine persönliche Datenbank auf dieser Mashine, oder einen Datenbankserver verwenden möchten.", labelWidth: "80%"},
@@ -28,12 +94,13 @@ dhtmlxEvent(window,"load",function(){
           fDatabaseSettings.hideItem('pSQLite');
           fDatabaseSettings.showItem('pSQLServer');
         } else if (fDatabaseTyp.getItemValue('n1')=='serv') {
-          acWizard.goNext();
+          acWizard.goLast();
+          SaveWizard();
         } else {
           fDatabaseSettings.hideItem('pSQLServer');
           fDatabaseSettings.showItem('pSQLite');
         }
-        acWizard.goNext();
+        setTimeout(function(){ acWizard.goNext(); }, 100);
       }
     });
     acWizard.addCell("tsDatabaseSettings");
@@ -47,9 +114,9 @@ dhtmlxEvent(window,"load",function(){
     		{type: "block", width: "auto", blockOffset: "", name: "pSQLServer", list: [
     			{type: "settings", offsetLeft: "50"},
     			{type: "label", label: "Datenbanktyp", value: ""},
-    			{type: "radio", label: "PostgresSQL", name: "n1", checked: true},
-    			{type: "radio", label: "MySQL", name: "n1"},
-    			{type: "radio", label: "Microsoft SQL Server", name: "n1"},
+    			{type: "radio", label: "PostgresSQL", name: "n3", checked: true, value: "postgres7"},
+    			{type: "radio", label: "MySQL", name: "n3", value: "mysql"},
+    			{type: "radio", label: "Microsoft SQL Server", name: "n3", value: "mssql"},
     			{type: "newcolumn", offset: "50"},
     			{type: "label", label: "Datenbankverbindung", value: ""},
     			{type: "input", label: "Server", name: "srv", value: "localhost"},
@@ -66,76 +133,7 @@ dhtmlxEvent(window,"load",function(){
     ]);
     fDatabaseSettings.attachEvent("onButtonClick", function(id){
       if (id=='bNext') {
-        acWizard.goNext();
-        LoadData('/configuration/status',function(Data){
-          //console.log(Data);
-          if ((Data)&&(Data.xmlDoc)) {
-            if (Data.xmlDoc.status == 200) { // No Configuration found
-              dhtmlx.message({
-                type : "info",
-                text: "Konfiguration wird übertragen",
-                expire: 1000
-              });
-              var iData = 'SQL:';
-              if (fDatabaseTyp.getItemValue('n1')=='db') {
-                if (fDatabaseSettings.getItemValue('n1')==0) {
-                  iData += 'postgres7;';
-                } else if (fDatabaseSettings.getItemValue('n1')==1) {
-                  iData += 'mysql;';
-                } else if (fDatabaseSettings.getItemValue('n1')==2) {
-                  iData += 'mssql;';
-                }
-                iData += fDatabaseSettings.getItemValue('srv')+';'+fDatabaseSettings.getItemValue('db')+';'+fDatabaseSettings.getItemValue('user')+';'+fDatabaseSettings.getItemValue('pw')+';';
-              } else if (fDatabaseTyp.getItemValue('n1')=='serv') {
-                iData += 'sqlite-3-edata;;help/help.db;;;';
-              } else {
-                iData += 'sqlite-3;;'+fDatabaseSettings.getItemValue('db1')+';;;';
-              }
-              StoreData('/configuration/add',iData,function(Data){
-                if ((Data)&&(Data.xmlDoc)&&(Data.xmlDoc.status == 200)) {
-                    console.log("Data stored");
-                    dhtmlx.message({
-                      type : "info",
-                      text: "Daten erfolgreich gespeichert",
-                      expire: 5000
-                    });
-                    parent.window.location.href = 'index.html';
-                } else {
-                  console.log("Data not stored");
-                  dhtmlx.message({
-                    type : "error",
-                    text: "Fehler beim Speichern der Daten:"+Data.xmlDoc.response,
-                    expire: 5000
-                  });
-                  setTimeout(function(){ acWizard.goFirst(); }, 500);
-                }
-              },true);
-            } else if (Data.xmlDoc.status == 403) { //Server already configured
-              dhtmlx.message({
-                type : "info",
-                text: "Appserver ist bereits konfiguriert",
-                expire: 5000
-              });
-              acWizard.goFirst();
-            } else {
-              dhtmlx.message({
-                type : "error",
-                text: "Fehler beim kontaktieren des Appservers",
-                expire: 5000
-              });
-              setTimeout(function(){ acWizard.goFirst(); }, 500);
-            }
-            console.log('Data there');
-          } else {
-            dhtmlx.message({
-              type : "error",
-              text: "Appserver nicht erreichbar",
-              expire: 5000
-            });
-            console.log('Appserver not there');
-            acWizard.goFirst();
-          }
-        },true);
+        SaveWizard();
       }
       if (id=='bPrior')
         acWizard.goPrev();
