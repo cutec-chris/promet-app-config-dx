@@ -104,7 +104,7 @@ dhtmlxEvent(window,"load",function(){
                   console.log("Data not stored");
                   dhtmlx.message({
                     type : "error",
-                    text: "Fehler beim Speichern der Daten",
+                    text: "Fehler beim Speichern der Daten:"+Data.xmlDoc.response,
                     expire: 5000
                   });
                   setTimeout(function(){ acWizard.goFirst(); }, 500);
