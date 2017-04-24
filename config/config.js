@@ -34,7 +34,7 @@ function SaveWizard(){
             dhtmlx.message({
               type : "error",
               text: "Fehler beim Speichern der Daten:"+Data.xmlDoc.response,
-              expire: 5000
+              expire: 30000
             });
             setTimeout(function(){ acWizard.goFirst(); }, 500);
           }
@@ -80,7 +80,7 @@ dhtmlxEvent(window,"load",function(){
         	{type: "block", width: "auto", blockOffset: 20, list: [
             {type: "radio", label: "Lokale Server Datenbank", name: "n1", value:"serv", checked: true},
             {type: "label", label: "Es wird eine mitgelieferte Vorkonfigurietrte Datenbank benutzt. Diese verhält sich wie eine Persönliche Datenbank, muss aber nicht separate erstellt und eingerichtet werden.", value: "", labelWidth: "80%"},
-        		{type: "radio", label: "Persönliche Datenbank", name: "n1", value:"pers", checked: true},
+        		{type: "radio", label: "Persönliche Datenbank", name: "n1", value:"pers"},
         		{type: "label", label: "Bei dieser Variante benötigen Sie keinen Datenbankserver, können dafür allerdings auch nur mit bis zu 3 Clients an der selben Datenbank arbeiten. Empfohlen wird diese Variante wenn Sie hauptsächlich allein mit der Datenbank arbeiten", value: "", labelWidth: "80%"},
         		{type: "radio", label: "Datenbankserver", name: "n1", value:"db"},
         		{type: "label", label: "Verwenden Sie diese Option, wenn Sie bereits einen Datenbankserver besitzen/verwenden oder einrichten möchten. Oder wenn Sie mit Mitarbeitern im Netzwerk auf die Datenbank zugreifen möchten", value: "", labelWidth: "80%"}
@@ -114,7 +114,7 @@ dhtmlxEvent(window,"load",function(){
     		{type: "block", width: "auto", blockOffset: "", name: "pSQLServer", list: [
     			{type: "settings", offsetLeft: "50"},
     			{type: "label", label: "Datenbanktyp", value: ""},
-    			{type: "radio", label: "PostgresSQL", name: "n3", checked: true, value: "postgres7"},
+    			{type: "radio", label: "PostgresSQL", name: "n3", checked: true, value: "postgresql"},
     			{type: "radio", label: "MySQL", name: "n3", value: "mysql"},
     			{type: "radio", label: "Microsoft SQL Server", name: "n3", value: "mssql"},
     			{type: "newcolumn", offset: "50"},
