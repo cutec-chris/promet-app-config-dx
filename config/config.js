@@ -16,7 +16,7 @@ function SaveWizard(){
           iData += fDatabaseSettings.getItemValue('n3')+';';
           iData += fDatabaseSettings.getItemValue('srv')+';'+fDatabaseSettings.getItemValue('db')+';'+fDatabaseSettings.getItemValue('user')+';'+fDatabaseSettings.getItemValue('pw')+';';
         } else if (fDatabaseTyp.getItemValue('n1')=='serv') {
-          iData += 'sqlite-3;;help/help.db;;;';
+          iData += 'sqlite-3;;help.db;;;';
         } else {
           iData += 'sqlite-3;;'+fDatabaseSettings.getItemValue('db1')+';;;';
         }
