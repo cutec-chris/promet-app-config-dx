@@ -28,7 +28,7 @@ function SaveWizard(){
                 text: "Daten erfolgreich gespeichert",
                 expire: 5000
               });
-              parent.window.location.href = 'index.html';
+              parent.window.location.href = '../index.html';
           } else {
             console.log("Data not stored");
             dhtmlx.message({
