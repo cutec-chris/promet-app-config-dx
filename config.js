@@ -72,6 +72,7 @@ dhtmlxEvent(window,"load",function(){
   siConfig = window.parent.sbMain.cells('siInstall');
   acWizard = siConfig.attachCarousel();
   acWizard.hideControls();
+  acWizard.area.style.margin="-1px";
   acWizard.addCell("tsDatabaseTyp");
 	fDatabaseTyp = acWizard.cells("tsDatabaseTyp").attachForm([
       {type: "block", width: "auto", blockOffset: "20", offsetTop: "30", name: "pSQLite", list: [
