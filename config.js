@@ -22,10 +22,11 @@
       var Result = undefined;
       if (aValue.status === 200) {
         dhtmlx.message(pas.JS.New(["type","info","text",rtl.getResStr(pas.config,"strDataisStored"),"expire",1000]));
+        acWizard.cells("tsDone").attachHTMLString(rtl.getResStr(pas.config,"strDataisStored"));
         window.location.href = pas.Avamm.GetBaseUrl() + "\/index.html";
       } else {
         dhtmlx.message(pas.JS.New(["type","error","text",rtl.getResStr(pas.config,"strErrorDataStore") + aValue.responseText,"expire",10000]));
-        window.setTimeout(GotoFirst,100);
+        window.setTimeout(GotoFirst,500);
       };
       return Result;
     };
@@ -44,10 +45,10 @@
         pas.Avamm.StoreData("\/configuration\/add",iData,false,"",6000).then(DataIsStored);
       } else if (aValue.status === 403) {
         dhtmlx.message(pas.JS.New(["type","info","text",rtl.getResStr(pas.config,"strAppserverConfigured"),"expire",1000]));
-        window.setTimeout(GotoFirst,100);
+        window.setTimeout(GotoFirst,500);
       } else {
         dhtmlx.message(pas.JS.New(["type","error","text",rtl.getResStr(pas.config,"strErrorAppserverreachable"),"expire",10000]));
-        window.setTimeout(GotoFirst,100);
+        window.setTimeout(GotoFirst,500);
       };
       return Result;
     };
@@ -67,14 +68,14 @@
           fDatabaseSettings.hideItem("pSQLServer");
           fDatabaseSettings.showItem("pSQLite");
         };
-        window.setTimeout(GotoNext,100);
+        window.setTimeout(GotoNext,500);
       };
     };
     function FormButtonClick2(id) {
       if (id === "bNext") {
-        window.setTimeout(GotoNext,100);
+        window.setTimeout(GotoNext,500);
       } else if (id === "bPrior") {
-        window.setTimeout(GotoPrior,100);
+        window.setTimeout(GotoPrior,500);
       };
     };
     pas.System.Writeln("configuring...");
@@ -90,9 +91,9 @@
     fDatabaseTyp.addItem(null,pas.JS.New(["type","block","width","auto","blockOffset",20,"offsetTop",30,"name","pDBType"]));
     fDatabaseTyp.addItem("pDBType",pas.JS.New(["type","radio","label",rtl.getResStr(pas.config,"strLocaldatabase"),"name","n1","value","serv","checked",true]));
     fDatabaseTyp.addItem("pDBType",pas.JS.New(["type","label","label",rtl.getResStr(pas.config,"strLocaldatabaseDesc")]));
-    fDatabaseTyp.addItem("pDBType",pas.JS.New(["type","radio","label",rtl.getResStr(pas.config,"strPersonaldatabase"),"name","n1","value","serv","checked",true]));
+    fDatabaseTyp.addItem("pDBType",pas.JS.New(["type","radio","label",rtl.getResStr(pas.config,"strPersonaldatabase"),"name","n1","value","serv","checked",false]));
     fDatabaseTyp.addItem("pDBType",pas.JS.New(["type","label","label",rtl.getResStr(pas.config,"strPersonaldatabaseDesc")]));
-    fDatabaseTyp.addItem("pDBType",pas.JS.New(["type","radio","label",rtl.getResStr(pas.config,"strServerdatabase"),"name","n1","value","serv","checked",true]));
+    fDatabaseTyp.addItem("pDBType",pas.JS.New(["type","radio","label",rtl.getResStr(pas.config,"strServerdatabase"),"name","n1","value","serv","checked",false]));
     fDatabaseTyp.addItem("pDBType",pas.JS.New(["type","label","label",rtl.getResStr(pas.config,"strServerdatabaseDesc")]));
     fDatabaseTyp.addItem(null,pas.JS.New(["type","button","label",rtl.getResStr(pas.config,"strServerdatabase"),"name","bNext","value",rtl.getResStr(pas.config,"strNext")]));
     fDatabaseTyp.attachEvent("onButtonClick",FormButtonClick);
@@ -119,10 +120,11 @@
     fDatabaseSettings.addItem(null,pas.JS.New(["type","button","label",rtl.getResStr(pas.config,"strServerdatabase"),"name","bNext","value",rtl.getResStr(pas.config,"strNext")]));
     fDatabaseSettings.attachEvent("onButtonClick",FormButtonClick2);
     acWizard.addCell("tsDone",2);
+    acWizard.cells("tsDone").attachHTMLString(rtl.getResStr(pas.config,"strConfigurationwillbesaved"));
     fDone = rtl.getObject(acWizard.cells("tsDone").attachForm(pas.JS.New([])));
     return Result;
   };
-  $mod.$resourcestrings = {strWelcome: {org: "Wilkomen"}, strDatabaseConfig: {org: "Hier können Sie festlegen, ob Sie eine persönliche Datenbank auf dieser Mashine, oder einen Datenbankserver verwenden möchten."}, strLocaldatabase: {org: "Lokale Server Datenbank"}, strLocaldatabaseDesc: {org: "Es wird eine mitgelieferte Vorkonfigurietrte Datenbank benutzt. Diese verhält sich wie eine Persönliche Datenbank, muss aber nicht separate erstellt und eingerichtet werden."}, strPersonaldatabase: {org: "Persönliche Datenbank"}, strPersonaldatabaseDesc: {org: "Bei dieser Variante benötigen Sie keinen Datenbankserver, können dafür allerdings auch nur mit bis zu 3 Clients an der selben Datenbank arbeiten. Empfohlen wird diese Variante wenn Sie hauptsächlich allein mit der Datenbank arbeiten"}, strServerdatabase: {org: "Datenbankserver"}, strServerdatabaseDesc: {org: "Verwenden Sie diese Option, wenn Sie bereits einen Datenbankserver besitzen\/verwenden oder einrichten möchten. Oder wenn Sie mit Mitarbeitern im Netzwerk auf die Datenbank zugreifen möchten"}, strNext: {org: "Weiter"}, strPrior: {org: "Zurück"}, strDatabaseConnection: {org: "Datenbankverbindung"}, strDatabasePath: {org: "Datenbankpfad"}, strDatabaseType: {org: "Datenbanktyp"}, strServer: {org: "Server"}, strDatabase: {org: "Datenbank(pfad)"}, strUser: {org: "Benutzer"}, strPassword: {org: "Passwort"}, strSendingConfig: {org: "Konfiguration wird übertragen"}, strAppserverConfigured: {org: "Appserver ist bereits konfiguriert"}, strErrorAppserverreachable: {org: "Fehler beim kontaktieren des Appservers"}, strDataisStored: {org: "Appserver erfolgreich konfiguriert !"}, strErrorDataStore: {org: "Fehler beim speichern: "}};
+  $mod.$resourcestrings = {strWelcome: {org: "Wilkomen"}, strDatabaseConfig: {org: "Hier können Sie festlegen, ob Sie eine persönliche Datenbank auf dieser Mashine, oder einen Datenbankserver verwenden möchten."}, strLocaldatabase: {org: "Lokale Server Datenbank"}, strLocaldatabaseDesc: {org: "Es wird eine mitgelieferte Vorkonfigurietrte Datenbank benutzt. Diese verhält sich wie eine Persönliche Datenbank, muss aber nicht separate erstellt und eingerichtet werden."}, strPersonaldatabase: {org: "Persönliche Datenbank"}, strPersonaldatabaseDesc: {org: "Bei dieser Variante benötigen Sie keinen Datenbankserver, können dafür allerdings auch nur mit bis zu 3 Clients an der selben Datenbank arbeiten. Empfohlen wird diese Variante wenn Sie hauptsächlich allein mit der Datenbank arbeiten"}, strServerdatabase: {org: "Datenbankserver"}, strServerdatabaseDesc: {org: "Verwenden Sie diese Option, wenn Sie bereits einen Datenbankserver besitzen\/verwenden oder einrichten möchten. Oder wenn Sie mit Mitarbeitern im Netzwerk auf die Datenbank zugreifen möchten"}, strNext: {org: "Weiter"}, strPrior: {org: "Zurück"}, strDatabaseConnection: {org: "Datenbankverbindung"}, strDatabasePath: {org: "Datenbankpfad"}, strDatabaseType: {org: "Datenbanktyp"}, strServer: {org: "Server"}, strDatabase: {org: "Datenbank(pfad)"}, strUser: {org: "Benutzer"}, strPassword: {org: "Passwort"}, strSendingConfig: {org: "Konfiguration wird übertragen"}, strAppserverConfigured: {org: "Appserver ist bereits konfiguriert"}, strErrorAppserverreachable: {org: "Fehler beim kontaktieren des Appservers"}, strDataisStored: {org: "Appserver erfolgreich konfiguriert !"}, strErrorDataStore: {org: "Fehler beim speichern: "}, strConfigurationwillbesaved: {org: "Konfiguration wird gespeichert...<br>"}};
   $mod.$init = function () {
     pas.dhtmlx_base.WidgetsetLoaded.then($mod.ShowConfig);
   };

@@ -29,6 +29,7 @@ resourcestring
   strErrorAppserverreachable    = 'Fehler beim kontaktieren des Appservers';
   strDataisStored               = 'Appserver erfolgreich konfiguriert !';
   strErrorDataStore             = 'Fehler beim speichern: ';
+  strConfigurationwillbesaved   = 'Konfiguration wird gespeichert...<br>';
 
 function ShowConfig(aValue : JSValue) : JSValue;
 var
@@ -56,6 +57,7 @@ var
                                'text', strDataisStored,
                                'expire', 1000
                                ]));
+        TDHTMLXCarouselCell(acWizard.cells('tsDone')).attachHTMLString(strDataisStored);
         window.location.href := Avamm.GetBaseUrl+'/index.html';
       end
     else
@@ -64,7 +66,7 @@ var
                                'text', strErrorDataStore+aValue.responseText,
                                'expire', 10000
                                ]));
-        window.setTimeout(@GotoFirst, 100);
+        window.setTimeout(@GotoFirst, 500);
       end;
   end;
   function StatusLoaded(aValue: TJSXMLHttpRequest): JSValue;
@@ -95,7 +97,7 @@ var
                                'text', strAppserverConfigured,
                                'expire', 1000
                                ]));
-        window.setTimeout(@GotoFirst, 100);
+        window.setTimeout(@GotoFirst, 500);
       end
     else
       begin
@@ -103,7 +105,7 @@ var
                                'text', strErrorAppserverreachable ,
                                'expire', 10000
                                ]));
-        window.setTimeout(@GotoFirst, 100);
+        window.setTimeout(@GotoFirst, 500);
       end;
   end;
   procedure SaveWizard;
@@ -131,18 +133,18 @@ var
             fDatabaseSettings.hideItem('pSQLServer');
             fDatabaseSettings.showItem('pSQLite');
           end;
-        window.setTimeout(@GotoNext, 100);
+        window.setTimeout(@GotoNext, 500);
       end;
   end;
   procedure FormButtonClick2(id : string);
   begin
     if id = 'bNext' then
       begin
-        window.setTimeout(@GotoNext, 100);
+        window.setTimeout(@GotoNext, 500);
       end
     else if id = 'bPrior' then
       begin
-        window.setTimeout(@GotoPrior, 100);
+        window.setTimeout(@GotoPrior, 500);
       end
   end;
 
@@ -185,7 +187,7 @@ begin
                                          'label',strPersonalDatabase,
                                          'name','n1',
                                          'value','serv',
-                                         'checked',true
+                                         'checked',false
                                         ]));
   fDatabaseTyp.addItem('pDBType',js.new(['type','label',
                                          'label',strPersonalDatabaseDesc
@@ -194,7 +196,7 @@ begin
                                          'label',strServerdatabase,
                                          'name','n1',
                                          'value','serv',
-                                         'checked',true
+                                         'checked',false
                                         ]));
   fDatabaseTyp.addItem('pDBType',js.new(['type','label',
                                          'label',strServerdatabaseDesc
@@ -298,6 +300,7 @@ begin
                                    ]));
   fDatabaseSettings.attachEvent('onButtonClick',@FormButtonClick2);
   acWizard.addCell('tsDone',2);
+  TDHTMLXCarouselCell(acWizard.cells('tsDone')).attachHTMLString(strConfigurationwillbesaved);
   fDone := TDHTMLXForm(acWizard.cells('tsDone').attachForm(js.new([])));
 end;
 
