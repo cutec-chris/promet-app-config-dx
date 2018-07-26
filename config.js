@@ -9,19 +9,51 @@
     var fDatabaseTyp = null;
     var fDatabaseSettings = null;
     var fDone = null;
-    function StatusLoaded(aValue) {
-      var Result = undefined;
-      return Result;
-    };
-    function SaveWizard() {
-      acWizard.goNext();
-      pas.Avamm.LoadData("\/configuration\/status",false,"",6000).then(StatusLoaded);
-    };
     function GotoNext() {
       acWizard.goNext();
     };
     function GotoPrior() {
       acWizard.goPrev();
+    };
+    function GotoFirst() {
+      acWizard.goFirst();
+    };
+    function DataIsStored(aValue) {
+      var Result = undefined;
+      if (aValue.status === 200) {
+        dhtmlx.message(pas.JS.New(["type","info","text",rtl.getResStr(pas.config,"strDataisStored"),"expire",1000]));
+        window.location.href = pas.Avamm.GetBaseUrl() + "\/index.html";
+      } else {
+        dhtmlx.message(pas.JS.New(["type","error","text",rtl.getResStr(pas.config,"strErrorDataStore") + aValue.responseText,"expire",10000]));
+        window.setTimeout(GotoFirst,100);
+      };
+      return Result;
+    };
+    function StatusLoaded(aValue) {
+      var Result = undefined;
+      var iData = "";
+      if (aValue.status === 200) {
+        dhtmlx.message(pas.JS.New(["type","info","text",rtl.getResStr(pas.config,"strSendingConfig"),"expire",1000]));
+        iData = "SQL:";
+        if (fDatabaseTyp.getItemValue("n1") == "db") {
+          iData = (iData + ("" + fDatabaseSettings.getItemValue("n3"))) + ";";
+          iData = (((((((iData + ("" + fDatabaseSettings.getItemValue("srv"))) + ";") + ("" + fDatabaseSettings.getItemValue("db"))) + ";") + ("" + fDatabaseSettings.getItemValue("user"))) + ";") + ("" + fDatabaseSettings.getItemValue("pw"))) + ";";
+        } else if (fDatabaseTyp.getItemValue("n1") == "serv") {
+          iData = iData + "sqlite-3;;help.db;;;"}
+         else iData = ((iData + "sqlite-3;;") + ("" + fDatabaseSettings.getItemValue("db1"))) + ";;;";
+        pas.Avamm.StoreData("\/configuration\/add",iData,false,"",6000).then(DataIsStored);
+      } else if (aValue.status === 403) {
+        dhtmlx.message(pas.JS.New(["type","info","text",rtl.getResStr(pas.config,"strAppserverConfigured"),"expire",1000]));
+        window.setTimeout(GotoFirst,100);
+      } else {
+        dhtmlx.message(pas.JS.New(["type","error","text",rtl.getResStr(pas.config,"strErrorAppserverreachable"),"expire",10000]));
+        window.setTimeout(GotoFirst,100);
+      };
+      return Result;
+    };
+    function SaveWizard() {
+      acWizard.goNext();
+      pas.Avamm.LoadData("\/configuration\/status",false,"",6000).then(StatusLoaded);
     };
     function FormButtonClick(id) {
       if (id === "bNext") {
@@ -90,7 +122,7 @@
     fDone = rtl.getObject(acWizard.cells("tsDone").attachForm(pas.JS.New([])));
     return Result;
   };
-  $mod.$resourcestrings = {strWelcome: {org: "Wilkomen"}, strDatabaseConfig: {org: "Hier können Sie festlegen, ob Sie eine persönliche Datenbank auf dieser Mashine, oder einen Datenbankserver verwenden möchten."}, strLocaldatabase: {org: "Lokale Server Datenbank"}, strLocaldatabaseDesc: {org: "Es wird eine mitgelieferte Vorkonfigurietrte Datenbank benutzt. Diese verhält sich wie eine Persönliche Datenbank, muss aber nicht separate erstellt und eingerichtet werden."}, strPersonaldatabase: {org: "Persönliche Datenbank"}, strPersonaldatabaseDesc: {org: "Bei dieser Variante benötigen Sie keinen Datenbankserver, können dafür allerdings auch nur mit bis zu 3 Clients an der selben Datenbank arbeiten. Empfohlen wird diese Variante wenn Sie hauptsächlich allein mit der Datenbank arbeiten"}, strServerdatabase: {org: "Datenbankserver"}, strServerdatabaseDesc: {org: "Verwenden Sie diese Option, wenn Sie bereits einen Datenbankserver besitzen\/verwenden oder einrichten möchten. Oder wenn Sie mit Mitarbeitern im Netzwerk auf die Datenbank zugreifen möchten"}, strNext: {org: "Weiter"}, strPrior: {org: "Zurück"}, strDatabaseConnection: {org: "Datenbankverbindung"}, strDatabasePath: {org: "Datenbankpfad"}, strDatabaseType: {org: "Datenbanktyp"}, strServer: {org: "Server"}, strDatabase: {org: "Datenbank(pfad)"}, strUser: {org: "Benutzer"}, strPassword: {org: "Passwort"}};
+  $mod.$resourcestrings = {strWelcome: {org: "Wilkomen"}, strDatabaseConfig: {org: "Hier können Sie festlegen, ob Sie eine persönliche Datenbank auf dieser Mashine, oder einen Datenbankserver verwenden möchten."}, strLocaldatabase: {org: "Lokale Server Datenbank"}, strLocaldatabaseDesc: {org: "Es wird eine mitgelieferte Vorkonfigurietrte Datenbank benutzt. Diese verhält sich wie eine Persönliche Datenbank, muss aber nicht separate erstellt und eingerichtet werden."}, strPersonaldatabase: {org: "Persönliche Datenbank"}, strPersonaldatabaseDesc: {org: "Bei dieser Variante benötigen Sie keinen Datenbankserver, können dafür allerdings auch nur mit bis zu 3 Clients an der selben Datenbank arbeiten. Empfohlen wird diese Variante wenn Sie hauptsächlich allein mit der Datenbank arbeiten"}, strServerdatabase: {org: "Datenbankserver"}, strServerdatabaseDesc: {org: "Verwenden Sie diese Option, wenn Sie bereits einen Datenbankserver besitzen\/verwenden oder einrichten möchten. Oder wenn Sie mit Mitarbeitern im Netzwerk auf die Datenbank zugreifen möchten"}, strNext: {org: "Weiter"}, strPrior: {org: "Zurück"}, strDatabaseConnection: {org: "Datenbankverbindung"}, strDatabasePath: {org: "Datenbankpfad"}, strDatabaseType: {org: "Datenbanktyp"}, strServer: {org: "Server"}, strDatabase: {org: "Datenbank(pfad)"}, strUser: {org: "Benutzer"}, strPassword: {org: "Passwort"}, strSendingConfig: {org: "Konfiguration wird übertragen"}, strAppserverConfigured: {org: "Appserver ist bereits konfiguriert"}, strErrorAppserverreachable: {org: "Fehler beim kontaktieren des Appservers"}, strDataisStored: {org: "Appserver erfolgreich konfiguriert !"}, strErrorDataStore: {org: "Fehler beim speichern: "}};
   $mod.$init = function () {
     pas.dhtmlx_base.WidgetsetLoaded.then($mod.ShowConfig);
   };

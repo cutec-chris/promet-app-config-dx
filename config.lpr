@@ -24,6 +24,11 @@ resourcestring
   strDatabase                   = 'Datenbank(pfad)';
   strUser                       = 'Benutzer';
   strPassword                   = 'Passwort';
+  strSendingConfig              = 'Konfiguration wird übertragen';
+  strAppserverConfigured        = 'Appserver ist bereits konfiguriert';
+  strErrorAppserverreachable    = 'Fehler beim kontaktieren des Appservers';
+  strDataisStored               = 'Appserver erfolgreich konfiguriert !';
+  strErrorDataStore             = 'Fehler beim speichern: ';
 
 function ShowConfig(aValue : JSValue) : JSValue;
 var
@@ -31,80 +36,6 @@ var
   Layout: TDHTMLXLayout;
   acWizard: TDHTMLXCarousel;
   fDatabaseTyp,fDatabaseSettings, fDone: TDHTMLXForm;
-  function StatusLoaded(aValue: JSValue): JSValue;
-  begin
-
-  end;
-  procedure SaveWizard;
-  begin
-    acWizard.goNext();
-    LoadData('/configuration/status')._then(@StatusLoaded);
-    {
-    -    //console.log(Data);
-    -    if ((Data)&&(Data.xmlDoc)) {
-    -      if (Data.xmlDoc.status == 200) { // No Configuration found
-    -        dhtmlx.message({
-    -          type : "info",
-    -          text: "Konfiguration wird übertragen",
-    -          expire: 1000
-    -        });
-    -        var iData = 'SQL:';
-    -        if (fDatabaseTyp.getItemValue('n1')=='db') {
-    -          iData += fDatabaseSettings.getItemValue('n3')+';';
-    -          iData += fDatabaseSettings.getItemValue('srv')+';'+fDatabaseSettings.getItemValue('db')+';'+fDatabaseSettings.getItemValue('user')+';'+fDatabaseSettings.getItemValue('pw')+';';
-    -        } else if (fDatabaseTyp.getItemValue('n1')=='serv') {
-    -          iData += 'sqlite-3;;help.db;;;';
-    -        } else {
-    -          iData += 'sqlite-3;;'+fDatabaseSettings.getItemValue('db1')+';;;';
-    -        }
-    -        StoreData('/configuration/add',iData,function(Data){
-    -          if ((Data)&&(Data.xmlDoc)&&(Data.xmlDoc.status == 200)) {
-    -              console.log("Data stored");
-    -              dhtmlx.message({
-    -                type : "info",
-    -                text: "Daten erfolgreich gespeichert",
-    -                expire: 5000
-    -              });
-    -              parent.window.location.href = '../index.html';
-    -          } else {
-    -            console.log("Data not stored");
-    -            dhtmlx.message({
-    -              type : "error",
-    -              text: "Fehler beim Speichern der Daten:"+Data.xmlDoc.response,
-    -              expire: 30000
-    -            });
-    -            setTimeout(function(){ acWizard.goFirst(); }, 500);
-    -          }
-    -        },true);
-    -      } else if (Data.xmlDoc.status == 403) { //Server already configured
-    -        dhtmlx.message({
-    -          type : "info",
-    -          text: "Appserver ist bereits konfiguriert",
-    -          expire: 5000
-    -        });
-    -        acWizard.goFirst();
-    -      } else {
-    -        dhtmlx.message({
-    -          type : "error",
-    -          text: "Fehler beim kontaktieren des Appservers",
-    -          expire: 5000
-    -        });
-    -        setTimeout(function(){ acWizard.goFirst(); }, 500);
-    -      }
-    -      console.log('Data there');
-    -    } else {
-    -      dhtmlx.message({
-    -        type : "error",
-    -        text: "Appserver nicht erreichbar",
-    -        expire: 5000
-    -      });
-    -      console.log('Appserver not there');
-    -      acWizard.goFirst();
-    -    }
-    -  ,true);
-    }
-  end;
-
   procedure GotoNext;
   begin
     acWizard.goNext;
@@ -113,6 +44,74 @@ var
   begin
     acWizard.goPrev;
   end;
+  procedure GotoFirst;
+  begin
+    acWizard.goFirst;
+  end;
+  function DataIsStored(aValue: TJSXMLHttpRequest): JSValue;
+  begin
+    if aValue.Status=200 then
+      begin
+        dhtmlx.message(js.new(['type','info',
+                               'text', strDataisStored,
+                               'expire', 1000
+                               ]));
+        window.location.href := Avamm.GetBaseUrl+'/index.html';
+      end
+    else
+      begin
+        dhtmlx.message(js.new(['type','error',
+                               'text', strErrorDataStore+aValue.responseText,
+                               'expire', 10000
+                               ]));
+        window.setTimeout(@GotoFirst, 100);
+      end;
+  end;
+  function StatusLoaded(aValue: TJSXMLHttpRequest): JSValue;
+  var
+    iData: String;
+  begin
+    if aValue.Status=200 then
+      begin
+        dhtmlx.message(js.new(['type','info',
+                               'text', strSendingConfig,
+                               'expire', 1000
+                               ]));
+        iData := 'SQL:';
+        if (fDatabaseTyp.getItemValue('n1')='db') then
+          begin
+            iData := iData+string(fDatabaseSettings.getItemValue('n3'))+';';
+            iData := iData+string(fDatabaseSettings.getItemValue('srv'))+';'+string(fDatabaseSettings.getItemValue('db'))+';'+string(fDatabaseSettings.getItemValue('user'))+';'+string(fDatabaseSettings.getItemValue('pw'))+';';
+          end
+        else if (fDatabaseTyp.getItemValue('n1')='serv') then
+          iData := iData+'sqlite-3;;help.db;;;'
+        else
+          iData := iData+'sqlite-3;;'+string(fDatabaseSettings.getItemValue('db1'))+';;;';
+        StoreData('/configuration/add',iData)._then(TJSPromiseResolver(@DataIsStored));
+      end
+    else if aValue.Status=403 then
+      begin
+        dhtmlx.message(js.new(['type','info',
+                               'text', strAppserverConfigured,
+                               'expire', 1000
+                               ]));
+        window.setTimeout(@GotoFirst, 100);
+      end
+    else
+      begin
+        dhtmlx.message(js.new(['type','error',
+                               'text', strErrorAppserverreachable ,
+                               'expire', 10000
+                               ]));
+        window.setTimeout(@GotoFirst, 100);
+      end;
+  end;
+  procedure SaveWizard;
+  begin
+    acWizard.goNext();
+    LoadData('/configuration/status')._then(TJSPromiseResolver(@StatusLoaded));
+  end;
+
   procedure FormButtonClick(id : string);
   begin
     if id = 'bNext' then
