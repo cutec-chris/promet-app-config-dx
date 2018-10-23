@@ -149,7 +149,7 @@ var
   end;
 
 begin
-  writeln('configuring...');
+  console.log('configuring...');
   FParent := Avamm.GetAvammContainer();
   Layout := TDHTMLXLayout.New(js.new(['parent',FParent,'pattern','1C']));
   Layout.cells('a').hideHeader;
